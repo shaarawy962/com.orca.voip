@@ -1,0 +1,28 @@
+{
+  "name": "com.orca.orcavoip",
+  "displayName": "Orca VOIP",
+  "description": "VOIP solution for games",
+  "version": "1.0.0",
+  "unity": "2021.2",
+  "dependencies": {
+    "com.unity.webrtc":"2.4.0-exp.6",
+    "com.endel.nativewebsocket": "1.1.4",
+    "com.unity.textmeshpro": "3.0.6"
+  },
+  "repository": {
+    "url": "",
+    "type": "git"
+  },
+  "publishConfig": {
+    "registry": "https://package.openupm.com"
+  },
+  "keywords": [
+    "orca",
+    "VOIP"
+  ],
+  "author": {
+    "name": "Orca"
+  },
+  "type": "tests",
+  "hideInEditor": false
+}

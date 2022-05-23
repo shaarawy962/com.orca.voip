@@ -1,0 +1,16 @@
+{
+    "name": "orca.orcavoip.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:ee09af04613ab454bba10f6d47209fe5"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
