@@ -163,12 +163,6 @@ namespace orca.orcavoip
             public int SdpMLineIndex;
         }
 
-        public class IceCandidateExchangeEventData
-        {
-
-            [JsonProperty("candidate")]
-            public IceCandidateData candidate;
-        }
 
         public class LeaveChannelRequest
         {

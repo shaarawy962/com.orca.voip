@@ -40,6 +40,11 @@ namespace orca.orcavoip
             public T data;
         }
 
+        public class EmptyWebSocketMessage
+        {
+            public Base.webSocketEvent type;
+        }
+
         [JsonObject]
         public class EventData
         {
@@ -106,7 +111,16 @@ namespace orca.orcavoip
             public Snowflake[] users;
         }
 
-        public class AnswerEventData
+        public class AnswerEventRequest
+        {
+            [JsonProperty("target")]
+            public Snowflake target;
+
+            [JsonProperty("answer")]
+            public RTCSessionDescription answer;
+        }
+        
+        public class AnswerEventResponse
         {
             [JsonProperty("source")]
             public Snowflake source;
@@ -130,10 +144,19 @@ namespace orca.orcavoip
             public Snowflake source;
         }
 
-        public class OfferEventData
+        public class OfferEventResponse
         {
             [JsonProperty("source")]
             public Snowflake source;
+
+            [JsonProperty("target")]
+            public Snowflake target;
+
+            [JsonProperty("offer")]
+            public RTCSessionDescription offer;
+        }
+        public class OfferEventRequest
+        {
 
             [JsonProperty("target")]
             public Snowflake target;
@@ -181,10 +204,20 @@ namespace orca.orcavoip
             public int SdpMLineIndex;
         }
 
-        public class IceCandidateExchangeEventData
+        public class IceCandidateExchangeEventResponse
         {
             [JsonProperty("source")]
             public Snowflake source;
+
+            [JsonProperty("target")]
+            public Snowflake target;
+
+            [JsonProperty("candidate")]
+            public IceCandidateData candidate;
+        }
+
+        public class IceCandidateExchangeEventRequest
+        {
 
             [JsonProperty("target")]
             public Snowflake target;

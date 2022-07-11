@@ -39,8 +39,8 @@ namespace orca.orcavoip
             // public Channel channel;
 
             // public string userID;
-            // protected internal event CreateChannelEventHandler createChannel;
-            // protected internal event JoinChannelEventHandler joinChannel;
+            protected internal event CreateChannelEventHandler createChannel;
+            protected internal event JoinChannelEventHandler joinChannel;
 
             // protected internal event DisconnectFromChannelEventHandler disconnectFromChannel;
 
@@ -70,6 +70,10 @@ namespace orca.orcavoip
             // [SerializeField]
             // private Button connect;
 
+            string url, mode, key;
+
+               
+
             #endregion
 
             #region callbacks
@@ -80,8 +84,24 @@ namespace orca.orcavoip
                 base.SendMessage(param);
             }
 
-            async public override void Connect()
+            public override void Connect(string url, string mode, string Key)
             {
+                throw new NotImplementedException();
+            }
+
+            async public Task ConnectAsync()
+            {
+
+
+                
+                //orcaApi = (OrcaVOIP) Resources.Load("OrcaSetting.asset") as OrcaVOIP;
+                //if (orcaApi == null)
+                //{
+                //    Debug.LogError("Couldn't connect as config isn't initialized");
+                //    return;
+                //}
+
+                //Debug.Log($"Key {OrcaVOIP.GetAuthKey()}");
                 if (websocket != null && (websocket.State == WebSocketState.Open || websocket.State == WebSocketState.Connecting))
                 {
                     Debug.LogError($"{websocket} socket is already connected");
@@ -93,6 +113,8 @@ namespace orca.orcavoip
                     websocket = null;
                 }
 
+                string encodedKey = Uri.EscapeDataString(key);
+
 
                 // if (url == null)
                 // {
@@ -100,8 +122,8 @@ namespace orca.orcavoip
                 //     websocket = new WebSocket($"ws://{IP_ADDRESS}:{PORT_NUMBER}");
                 // }
                 // else IP_ADDRESS = url;
-                IP_ADDRESS = IpAddress.text;
-                websocket = new WebSocket($"ws://{IP_ADDRESS}:{PORT_NUMBER}?mode=P2P?key={OrcaVOIP.GetAuthKey()}");
+                //IP_ADDRESS = IpAddress.text;
+                    websocket = new WebSocket($"ws://{url}?mode={mode}&key={encodedKey}");
 
                 websocket.OnOpen += async () =>
                 {
@@ -143,7 +165,7 @@ namespace orca.orcavoip
                     Debug.Log("Error! " + e);
                     Debug.Log("Couldn't connect to server");
                     await Task.Delay(2500);
-                    Connect();
+                    await ConnectAsync();
                 };
 
                 websocket.OnClose += (e) =>
@@ -152,7 +174,7 @@ namespace orca.orcavoip
                 };
 
                 disconnectFromChannel += () =>
-                    {
+                {
                         //var connection = connections[this.userId];
 
                         //var connection = connections[handler.userId];
@@ -178,7 +200,7 @@ namespace orca.orcavoip
                         /// close rtc peer connection, dispose of WebRTC
                         /// connections.Remove(this.userId);
                         //connection.Close();
-                    };
+                };
 
 
                 websocket.OnMessage += async (bytes) =>
@@ -211,6 +233,13 @@ namespace orca.orcavoip
 
             }
 
+            public void SetParameters(Snowflake uri, Snowflake mode, Snowflake key)
+            {
+                this.url = uri;
+                this.mode = mode;
+                this.key = key;
+            }
+
 
             public override void Update()
             {
@@ -233,11 +262,12 @@ namespace orca.orcavoip
 
             new private void Awake()
             {
-                //eventListener = FindObjectOfType<Listeners>();
+                
 
-                JoinBtn.onClick.AddListener(joinChannelMethod);
-                LeaveBtn.onClick.AddListener(leaveChannelMethod);
-                connect.onClick.AddListener(Connect);
+                Debug.Log($"AuthKey is set to {OrcaVOIP.AppSettings.AuthKey}");
+                //JoinBtn.onClick.AddListener(joinChannelMethod);
+                //LeaveBtn.onClick.AddListener(leaveChannelMethod);
+                //connect.onClick.AddListener(Connect);
 
 
 
@@ -261,6 +291,18 @@ namespace orca.orcavoip
                 // Debug.Log($"Channel ID: {channelId}");
                 // joinChannel?.Invoke(channelId);
                 base.joinChannelMethod();
+            }
+
+            public void JoinChannel(string channelID)
+            {
+                var listener = new Listeners();
+                joinChannel += listener.JoinChannelEmitter;
+                joinChannel?.Invoke(channelID);
+            }
+
+            public void CreateChannel()
+            {
+                createChannel?.Invoke();
             }
 
             protected override void leaveChannelMethod()

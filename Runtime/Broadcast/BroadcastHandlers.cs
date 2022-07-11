@@ -64,7 +64,7 @@ namespace orca.orcavoip
                     connection = gameObject.GetComponent<BroadcastConnection>();
                 }
 
-                WebRTC.Initialize();
+                //WebRTC.Initialize();
                 StartCoroutine(WebRTC.Update());
 
                 var codecs = RTCRtpSender.GetCapabilities(TrackKind.Audio).codecs;

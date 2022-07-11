@@ -2,8 +2,9 @@
 using UnityEngine;
 using UnityEditor;
 using orca.orcavoip;
-using PackageManager = UnityEditor.PackageManager;
-
+// using PackageManager = UnityEditor.PackageManager;
+#if UNITY_EDITOR
+[InitializeOnLoad]
 public class OrcaWizard : EditorWindow
 {
     string AuthenticationToken = "AuthKey";
@@ -14,24 +15,25 @@ public class OrcaWizard : EditorWindow
         EditorWindow.GetWindow(typeof(OrcaWizard));
     }
 
+    //private void Awake()
+    //{
+    //    if (OrcaVOIP.AppSettings != null && !string.IsNullOrEmpty(OrcaVOIP.AppSettings.AuthKey))
+    //    {
+    //        this.AuthenticationToken = OrcaVOIP.AppSettings.AuthKey;
+    //    }
+    //}
+
+    //private static void HighlightSettings()
+    //{
+    //    AppSettings appSettings = (AppSettings)Resources.Load(OrcaVOIP.appSettingsFileName, typeof(AppSettings));
+    //    Selection.objects = new UnityEngine.Object[] {appSettings};
+    //    EditorGUIUtility.PingObject(appSettings);
+    //}
+
     [MenuItem("Orca/Orca Wizard")]
-    [InitializeOnLoadMethod]
     static void Init()
     {
-        // var request = PackageManager.Client.Add("https://github.com/endel/NativeWebSocket.git#upm");
-        // if (request.IsCompleted)
-        // {
-        //     if (request.Status == PackageManager.StatusCode.Success)
-        //     {
-        //         Debug.Log("Package imported!");
-        //     }
-        // }
-        var packages = PackageManager.PackageInfo.GetAllRegisteredPackages();
-        foreach (var package in packages)
-        {
-            Debug.Log(package.packageId);
-        }
-        EditorWindow window = EditorWindow.CreateInstance<OrcaWizard>();
+        EditorWindow window = EditorWindow.CreateWindow<OrcaWizard>();
         window.Show();
     }
 
@@ -46,21 +48,47 @@ public class OrcaWizard : EditorWindow
         AuthenticationToken = EditorGUILayout.TextField("", AuthenticationToken);
         if (GUILayout.Button("Setup ORCA"))
         {
-            Debug.Log("Setting up ORCA");
             SetupAuthKey(AuthenticationToken);
+            
         }
         if (GUILayout.Button("Cancel"))
         {
+            OrcaVOIP.LoadOrCreateSettings();
             this.Close();
         }
         GUILayout.Space(20);
         GUILayout.Label("You can always close this window and setup later from the menu");
     }
 
+    //public override void SaveChanges()
+    //{
+    //    orca.SetAuthKey(AuthenticationToken);
+    //    base.SaveChanges();
+    //}
+
     private void SetupAuthKey(string AuthKey)
     {
         Debug.Log($"Setting up ORCA with key: {AuthKey}");
-        OrcaVOIP.SetAuthKey(AuthKey);
+        var settings = (AppSettings)Resources.Load("OrcaSetting", typeof(AppSettings));
+        if (settings != null)
+        {
+            settings.AuthKey = AuthKey;
+            return;
+        }
+        OrcaVOIP.LoadOrCreateSettings();
+        OrcaVOIP.AppSettings.AuthKey = AuthKey;
+        return;
     }
 
+    static string MakeProjectSpecificEditorPrefKey(string k)
+    {
+        int projectPathHash = Application.dataPath.GetHashCode();
+        return $"{projectPathHash:X}.{k}";
+    }
+
+    public static void SetString(string k, string v) => EditorPrefs.SetString(MakeProjectSpecificEditorPrefKey(k), v);
+    public static string GetString(string k) => EditorPrefs.GetString(MakeProjectSpecificEditorPrefKey(k));
+
 }
+
+#endif

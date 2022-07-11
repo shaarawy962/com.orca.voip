@@ -60,7 +60,7 @@ namespace orca.orcavoip
                     connection = gameObject.GetComponent<Connection>();
                 }
 
-                WebRTC.Initialize();
+                //WebRTC.Initialize();
                 StartCoroutine(WebRTC.Update());
 
                 var codecs = RTCRtpSender.GetCapabilities(TrackKind.Audio).codecs;
@@ -143,25 +143,7 @@ namespace orca.orcavoip
 
                 connection.OnIceCandidate = (RTCIceCandidate candidate) =>
                 {
-                    if (candidate == null)
-                    {
-                        Debug.Log("Found null candidate");
-                        return;
-                    }
-
-                    var candidateData = new P2P.IceCandidateData()
-                    {
-                        Candidate = candidate.Candidate,
-
-                        SdpMid = candidate.SdpMid,
-
-                        SdpMLineIndex = (int)candidate.SdpMLineIndex,
-                    };
-                    var iceData = new P2P.IceCandidateExchangeEventData { target = pairId, candidate = candidateData };
-                    var iceForwardEvent = new P2P.WebSocketMessage<P2P.IceCandidateExchangeEventData> { type = webSocketEvent.ICE_FORWARD, data = iceData };
-
-                    Debug.Log($"Sending ice candidate {iceForwardEvent}");
-                    this.connection.SendMessage(iceForwardEvent);
+                  
                 };
 
                 //FIXME: runs only on 1 partner
@@ -191,112 +173,19 @@ namespace orca.orcavoip
 
             public virtual IEnumerator<AsyncOperationBase> handleAnswer(string message)
             {
-                var request = JsonConvert.DeserializeObject<P2P.WebSocketMessage<P2P.AnswerEventData>>(message);
-                Debug.Log($"Answer received from {request.data.source}: {request.data.answer}");
-
-                var connection = connections[request.data.source];
-
-                if (connection == null)
-                {
-                    throw new Exception("Connection not found for source {request.data.source}");
-                }
-
-                Debug.Log($"Setting remote description {request.data.answer}");
-                var setRemoteOp = connection.SetRemoteDescription(ref request.data.answer);
-                yield return setRemoteOp;
-
-
-                if (setRemoteOp.IsError)
-                {
-                    throw new Exception($"setRemoteOp error {setRemoteOp.Error.message}");
-                }
+                yield return null;
             }
 
 
             public virtual IEnumerator<AsyncOperationBase> onNegotiationNeeded(RTCPeerConnection connection, Snowflake target)
             {
-                Debug.Log("Creating Offer");
-                var offer = connection.CreateOffer();
-                yield return offer;
-
-                if (offer.IsError)
-                {
-                    throw new Exception($"offer error {offer.Error.message}");
-                }
-
-                if (connection.SignalingState != RTCSignalingState.Stable)
-                {
-                    throw new Exception($"signaling state is not stable");
-                }
-
-                var desc = offer.Desc;
-                Debug.Log("Setting local description");
-
-                var setLocalOp = connection.SetLocalDescription(ref desc);
-                yield return setLocalOp;
-
-                if (setLocalOp.IsError)
-                {
-                    throw new Exception($"setLocalOp error {setLocalOp.Error.message}");
-                }
-
-                var offerEventData = new P2P.OfferEventData { target = target, offer = offer.Desc };
-                var offerEvent = new P2P.WebSocketMessage<P2P.OfferEventData> { type = webSocketEvent.OFFER, data = offerEventData };
-
-                Debug.Log($"Sending offer {desc.sdp.ToString()}");
-                this.connection.SendMessage(offerEvent);
+                yield return null;
             }
 
 
             public virtual IEnumerator<AsyncOperationBase> handleProvideOffer(string message)
             {
-                var request = JsonConvert.DeserializeObject<P2P.WebSocketMessage<P2P.OfferEventData>>(message);
-                Debug.Log($"Offer received from {request.data.source}: {request.data.offer}");
-
-                if (!connections.ContainsKey(request.data.source)) throw new Exception("Offer source ID not associated with a connection");
-
-                var connection = connections[request.data.source];
-
-                Debug.Log("Setting remote description");
-                var setRemoteOp = connection.SetRemoteDescription(ref request.data.offer);
-                yield return setRemoteOp;
-
-                if (setRemoteOp.IsError)
-                {
-                    throw new Exception($"setRemoteOp error {setRemoteOp.Error.message}");
-                }
-
-                var transceiver = connection.AddTransceiver(TrackKind.Audio);
-                transceiver.Direction = RTCRtpTransceiverDirection.SendRecv;
-                transceiver.SetCodecPreferences(availableCodes.ToArray());
-
-                var audioTrack = new AudioStreamTrack(inputAudioSource);
-                connection.AddTrack(audioTrack, inputStream);
-
-                Debug.Log("Creating Answer");
-                var answer = connection.CreateAnswer();
-                yield return answer;
-
-                if (answer.IsError)
-                {
-                    throw new Exception($"answer error {answer.Error.message}");
-                }
-
-                var desc = answer.Desc;
-                Debug.Log("Setting local description");
-                var setLocalOp = connection.SetLocalDescription(ref desc);
-                yield return setLocalOp;
-
-                if (setLocalOp.IsError)
-                {
-                    throw new Exception($"setLocalOp error {setLocalOp.Error.message}");
-                }
-
-                var answerEventData = new P2P.AnswerEventData { target = request.data.source, answer = answer.Desc };
-                var answerMessage = new P2P.WebSocketMessage<P2P.AnswerEventData> { type = webSocketEvent.ANSWER, data = answerEventData };
-
-                Debug.Log("Sending answer");
-                this.connection.SendMessage(answerMessage);
+                yield return null;
             }
 
             public virtual void handleInit(string message)
@@ -329,20 +218,7 @@ namespace orca.orcavoip
 
             public virtual void handleIceForward(string message)
             {
-                Debug.Log($"Received ice candidate {message}");
-                var request = JsonConvert.DeserializeObject<P2P.WebSocketMessage<P2P.IceCandidateExchangeEventData>>(message);
-
-                var connection = connections[request.data.source];
-                var candidate = new RTCIceCandidate(new RTCIceCandidateInit
-                {
-                    candidate = request.data.candidate.Candidate,
-                    sdpMid = request.data.candidate.SdpMid,
-                    sdpMLineIndex = request.data.candidate.SdpMLineIndex,
-                });
-
-                Debug.Log($"Setting ice candidate on connection: {request.data.candidate}");
-                bool success = connection.AddIceCandidate(candidate);
-                Debug.Log($"Ice candidate on connection status {success}");
+                
             }
 
             public virtual IEnumerator handleJoinedChannel(string message)
@@ -388,14 +264,15 @@ namespace orca.orcavoip
             public virtual void handleCreatedChannel(string message)
             {
                 Task.Run(() =>
-                       {
-                           var incomingMessage = JsonConvert.DeserializeObject<P2P.CreatedChannelEventData>(message);
+                {
+                    var incomingMessage = JsonConvert.DeserializeObject<P2P.CreatedChannelEventData>(message);
 
-                           if (channel == null)
-                           {
-                               P2P.Channel channel = new P2P.Channel(incomingMessage.channelId, new Snowflake[] { incomingMessage.userId });
-                           }
-                       });
+                    if (channel == null)
+                    {
+                        Channel incomingChannel = new Channel(incomingMessage.channelId, new Snowflake[] { incomingMessage.userId });
+                        this.channel = incomingChannel;
+                    }
+                });
 
                 return;
             }

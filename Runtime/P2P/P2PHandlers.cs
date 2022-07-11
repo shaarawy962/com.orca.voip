@@ -62,7 +62,7 @@ namespace orca.orcavoip
                     connection = gameObject.GetComponent<Connection>();
                 }
 
-                WebRTC.Initialize();
+                //WebRTC.Initialize();
                 StartCoroutine(WebRTC.Update());
 
                 var codecs = RTCRtpSender.GetCapabilities(TrackKind.Audio).codecs;
@@ -159,8 +159,8 @@ namespace orca.orcavoip
 
                         SdpMLineIndex = (int)candidate.SdpMLineIndex,
                     };
-                    var iceData = new P2P.IceCandidateExchangeEventData { target = pairId, candidate = candidateData };
-                    var iceForwardEvent = new P2P.WebSocketMessage<P2P.IceCandidateExchangeEventData> { type = webSocketEvent.ICE_FORWARD, data = iceData };
+                    var iceData = new P2P.IceCandidateExchangeEventRequest { target = pairId, candidate = candidateData };
+                    var iceForwardEvent = new P2P.WebSocketMessage<P2P.IceCandidateExchangeEventRequest> { type = webSocketEvent.ICE_FORWARD, data = iceData };
 
                     Debug.Log($"Sending ice candidate {iceForwardEvent}");
                     this.connection.SendMessage(iceForwardEvent);
@@ -193,7 +193,7 @@ namespace orca.orcavoip
 
             public override IEnumerator<AsyncOperationBase> handleAnswer(string message)
             {
-                var request = JsonConvert.DeserializeObject<P2P.WebSocketMessage<P2P.AnswerEventData>>(message);
+                var request = JsonConvert.DeserializeObject<P2P.WebSocketMessage<P2P.AnswerEventResponse>>(message);
                 Debug.Log($"Answer received from {request.data.source}: {request.data.answer}");
 
                 var connection = connections[request.data.source];
@@ -242,8 +242,8 @@ namespace orca.orcavoip
                     throw new Exception($"setLocalOp error {setLocalOp.Error.message}");
                 }
 
-                var offerEventData = new P2P.OfferEventData { target = target, offer = offer.Desc };
-                var offerEvent = new P2P.WebSocketMessage<P2P.OfferEventData> { type = webSocketEvent.OFFER, data = offerEventData };
+                var offerEventData = new P2P.OfferEventRequest { target = target, offer = offer.Desc };
+                var offerEvent = new P2P.WebSocketMessage<P2P.OfferEventRequest> { type = webSocketEvent.OFFER, data = offerEventData };
 
                 Debug.Log($"Sending offer {desc.sdp.ToString()}");
                 this.connection.SendMessage(offerEvent);
@@ -252,7 +252,7 @@ namespace orca.orcavoip
 
             public override IEnumerator<AsyncOperationBase> handleProvideOffer(string message)
             {
-                var request = JsonConvert.DeserializeObject<P2P.WebSocketMessage<P2P.OfferEventData>>(message);
+                var request = JsonConvert.DeserializeObject<P2P.WebSocketMessage<P2P.OfferEventResponse>>(message);
                 Debug.Log($"Offer received from {request.data.source}: {request.data.offer}");
 
                 if (!connections.ContainsKey(request.data.source)) throw new Exception("Offer source ID not associated with a connection");
@@ -294,8 +294,8 @@ namespace orca.orcavoip
                     throw new Exception($"setLocalOp error {setLocalOp.Error.message}");
                 }
 
-                var answerEventData = new P2P.AnswerEventData { target = request.data.source, answer = answer.Desc };
-                var answerMessage = new P2P.WebSocketMessage<P2P.AnswerEventData> { type = webSocketEvent.ANSWER, data = answerEventData };
+                var answerEventData = new P2P.AnswerEventRequest { target = request.data.source, answer = answer.Desc };
+                var answerMessage = new P2P.WebSocketMessage<P2P.AnswerEventRequest> { type = webSocketEvent.ANSWER, data = answerEventData };
 
                 Debug.Log("Sending answer");
                 this.connection.SendMessage(answerMessage);
@@ -332,7 +332,7 @@ namespace orca.orcavoip
             public override void handleIceForward(string message)
             {
                 Debug.Log($"Received ice candidate {message}");
-                var request = JsonConvert.DeserializeObject<P2P.WebSocketMessage<P2P.IceCandidateExchangeEventData>>(message);
+                var request = JsonConvert.DeserializeObject<P2P.WebSocketMessage<P2P.IceCandidateExchangeEventResponse>>(message);
 
                 var connection = connections[request.data.source];
                 var candidate = new RTCIceCandidate(new RTCIceCandidateInit

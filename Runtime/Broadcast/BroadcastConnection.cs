@@ -38,8 +38,8 @@ namespace orca.orcavoip
             // public Channel channel;
 
             // public string userID;
-            // protected internal event CreateChannelEventHandler createChannel;
-            // protected internal event JoinChannelEventHandler joinChannel;
+            protected internal event CreateChannelEventHandler createChannel;
+            protected internal event JoinChannelEventHandler joinChannel;
 
             // protected internal event DisconnectFromChannelEventHandler disconnectFromChannel;
 
@@ -69,6 +69,8 @@ namespace orca.orcavoip
             // [SerializeField]
             // private Button connect;
 
+            String url, mode, key;
+
             #endregion
 
             #region callbacks
@@ -79,8 +81,12 @@ namespace orca.orcavoip
                 websocket.SendText(JsonConvert.SerializeObject(param));
             }
 
-            async public override void Connect()
+            public override void Connect(String url, String mode, String key)
             {
+                this.mode = mode;
+                this.url = url;
+                this.key = key;
+
                 if (websocket != null && (websocket.State == WebSocketState.Open || websocket.State == WebSocketState.Connecting))
                 {
                     Debug.LogError($"{websocket} socket is already connected");
@@ -88,7 +94,7 @@ namespace orca.orcavoip
                 }
                 else if (websocket != null)
                 {
-                    await websocket.Close();
+                    websocket.Close();
                     websocket = null;
                 }
 
@@ -103,8 +109,8 @@ namespace orca.orcavoip
                 //     websocket = new WebSocket($"ws://{IP_ADDRESS}");
                 // }
                 IP_ADDRESS = IpAddress.text.ToString();
-                websocket = new WebSocket($"ws://{IP_ADDRESS}:{PORT_NUMBER}?mode=BROADCAST?key={OrcaVOIP.GetAuthKey()}");
-                
+                websocket = new WebSocket($"ws://{url}?mode={mode}?key={key}");
+
 
                 websocket.OnOpen += async () =>
                 {
@@ -146,7 +152,7 @@ namespace orca.orcavoip
                     Debug.Log("Error! " + e);
                     Debug.Log("Couldn't connect to server");
                     await Task.Delay(2500);
-                    Connect();
+                    Connect(url, mode, key);
                 };
 
                 websocket.OnClose += (e) =>
@@ -209,7 +215,7 @@ namespace orca.orcavoip
                 // Keep sending messages at every 0.3s
                 //InvokeRepeating("SendWebSocketMessage", 0.0f, 0.3f);
 
-                await websocket.Connect();
+                websocket.Connect();
                 // waiting for messages
 
             }
@@ -238,7 +244,7 @@ namespace orca.orcavoip
 
                 JoinBtn.onClick.AddListener(joinChannelMethod);
                 LeaveBtn.onClick.AddListener(leaveChannelMethod);
-                connect.onClick.AddListener(Connect);
+                //connect.onClick.AddListener(Connect);
 
 
 
@@ -250,6 +256,12 @@ namespace orca.orcavoip
                 base.CreateChannelMethod();
             }
 
+
+            public void CreateChannel()
+            {
+                createChannel?.Invoke();
+            }
+
             protected override void joinChannelMethod()
             {
                 // channelId = InputField.text;
@@ -258,6 +270,13 @@ namespace orca.orcavoip
                 base.joinChannelMethod();
             }
 
+
+            public void JoinChannel(String channelID)
+            {
+                var listener = new Listeners();
+                joinChannel += listener.JoinChannelEmitter;
+                joinChannel?.Invoke(channelID);
+            }
             protected override void leaveChannelMethod()
             {
                 //disconnectFromChannel += eventListener.disconnectEmitter;
