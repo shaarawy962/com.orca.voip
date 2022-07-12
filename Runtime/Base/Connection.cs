@@ -35,10 +35,12 @@ namespace orca.orcavoip
         {
             #region fields
 
+            [NonSerialized]
             public string channelId;
 
             public Channel channel;
 
+            [NonSerialized]
             public string userID;
             protected internal event CreateChannelEventHandler createChannel;
             protected internal event JoinChannelEventHandler joinChannel;
@@ -50,26 +52,26 @@ namespace orca.orcavoip
 
             //protected Listeners eventListener = null;
 
-            [SerializeField]
+            
             internal string IP_ADDRESS;
-            [SerializeField]
+            
             internal string PORT_NUMBER;
 
-            [SerializeField]
+            
             internal TMP_InputField InputField;
 
-            [SerializeField] internal Button LeaveBtn;
+            internal Button LeaveBtn;
 
-            [SerializeField] internal Button CreateBtn;
+            internal Button CreateBtn;
 
-            [SerializeField] internal Button JoinBtn;
+            internal Button JoinBtn;
 
             public WebSocket websocket = null;
 
-            [SerializeField]
+            [NonSerialized]
             internal TMP_InputField IpAddress;
 
-            [SerializeField]
+            [NonSerialized]
             internal Button connect;
 
             #endregion

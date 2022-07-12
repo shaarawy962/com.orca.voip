@@ -15,6 +15,8 @@ namespace orca.orcavoip
         using Snowflake = System.String;
 
         [AddComponentMenu("OrcaSDK/P2P/P2PHandlers")]
+        [RequireComponent(typeof(P2P.P2PConnection))]
+        [RequireComponent(typeof(AudioSource))]
         public class P2PHandlers : Handlers
         {
 

@@ -6,7 +6,7 @@ using Unity.WebRTC;
 using Newtonsoft.Json;
 using orca.orcavoip.Base;
 using System;
-
+using UnityEditor;
 
 namespace orca.orcavoip
 {
@@ -30,45 +30,13 @@ namespace orca.orcavoip
 
 
         [AddComponentMenu("OrcaSDK/P2P/P2PConnection")]
+        [RequireComponent(typeof(P2P.P2PHandlers))]
+        [RequireComponent(typeof(AudioSource))]
         public class P2PConnection : Connection
         {
             #region fields
-
-            // public string channelId;
-
-            // public Channel channel;
-
-            // public string userID;
             protected internal event CreateChannelEventHandler createChannel;
             protected internal event JoinChannelEventHandler joinChannel;
-
-            // protected internal event DisconnectFromChannelEventHandler disconnectFromChannel;
-
-            // internal Base.Handlers handler;
-
-            // protected Listeners eventListener = null;
-
-            // [SerializeField]
-            // string IP_ADDRESS;
-            // [SerializeField]
-            // string PORT_NUMBER;
-
-            // [SerializeField]
-            // private TMP_InputField InputField;
-
-            // [SerializeField] private Button LeaveBtn;
-
-            // [SerializeField] private Button CreateBtn;
-
-            // [SerializeField] private Button JoinBtn;
-
-            // //public WebSocket websocket = null;
-
-            // [SerializeField]
-            // TMP_InputField IpAddress;
-
-            // [SerializeField]
-            // private Button connect;
 
             string url, mode, key;
 
@@ -160,12 +128,37 @@ namespace orca.orcavoip
                     await websocket.SendText(JsonConvert.SerializeObject("hey"));
                 };
 
+                
                 websocket.OnError += async (e) =>
                 {
-                    Debug.Log("Error! " + e);
-                    Debug.Log("Couldn't connect to server");
-                    await Task.Delay(2500);
-                    await ConnectAsync();
+                    int numberOfTrials = 0;
+#if UNITY_EDITOR
+                    if (!EditorApplication.isPlaying) return;
+                    else if (EditorApplication.isPlaying)
+                    {
+                        while (numberOfTrials < 3)
+                        {
+                            numberOfTrials++;
+                            Debug.Log("Error! " + e);
+                            await Task.Delay(2500);
+                            await ConnectAsync();
+                        }
+                        Debug.LogError("Unable to Connect to server");
+
+                    }
+#endif
+                    if (Application.isPlaying)
+                    {
+                        while (numberOfTrials < 3)
+                        {
+                            numberOfTrials++;
+                            Debug.Log("Error! " + e);
+                            await Task.Delay(2500);
+                            await ConnectAsync();
+                            Debug.LogError("Unable to Connect to server");
+                        }
+                    }
+
                 };
 
                 websocket.OnClose += (e) =>

@@ -12,6 +12,10 @@ namespace orca.orcavoip
 
         [SerializeField]
         public VoipType type;
+
+        [SerializeField]
+        public string url;
+
         public string AuthKey
         {
 

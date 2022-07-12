@@ -19,6 +19,7 @@ namespace orca.orcavoip
             #region fields
 
             public Channel channel;
+            [NonSerialized]
             public Snowflake userId;
 
             //private Listeners eventListener;
@@ -32,14 +33,17 @@ namespace orca.orcavoip
 
             public AudioSource inputAudioSource = null;
             public MediaStream inputStream, outputStream;
+
+            [NonSerialized]
             public string m_deviceName = null;
 
             public AudioStreamTrack m_audioTrack;
+            [NonSerialized]
             public AudioClip audioclip;
 
             internal List<RTCRtpCodecCapability> availableCodes = new List<RTCRtpCodecCapability>();
 
-
+            [NonSerialized]
             public string channelId;
 
             #endregion

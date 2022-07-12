@@ -42,11 +42,12 @@ namespace orca.orcavoip
 
         public static AppSettings AppSettings
         {
-            get { 
+            get
+            {
                 if (appSettings == null)
                 {
                     LoadOrCreateSettings();
-                }    
+                }
                 return appSettings;
             }
             private set
@@ -58,7 +59,7 @@ namespace orca.orcavoip
         public const string appSettingsFileName = "OrcaSetting";
         private const string IP = "";
         private const string PORT = "";
-        string url = "156.208.65.166:34197";
+        string url = "156.208.154.74:8080";
         static internal string DummyChannelID;
         internal Base.Connection connection;
         internal Base.Handlers handler;
@@ -67,7 +68,7 @@ namespace orca.orcavoip
 
         internal AudioSource InputAudioSource, OutputAudioSource;
 
-        
+
         //public static void InitMethod()
         //{
         //    EditorApplication.quitting += IsAppQuitting;
@@ -88,15 +89,11 @@ namespace orca.orcavoip
             switch (OrcaVOIP.AppSettings.type)
             {
                 case VoipType.P2P:
-                    // connection = GameObject.FindObjectOfType<OrcaSdk.P2P.Connection>() as OrcaSdk.P2P.Connection;
-                    // handler = GameObject.FindObjectOfType<OrcaSdk.P2P.Handlers>() as OrcaSdk.P2P.Handlers;
-                    InitializeParams(appSettings.type);
+                    InitializeParams(AppSettings.type);
                     break;
 
                 case VoipType.Broadcast:
-                    // connection = GameObject.FindObjectOfType<OrcaSdk.Broadcast.Connection>() as OrcaSdk.Broadcast.Connection;
-                    // handler = GameObject.FindObjectOfType<OrcaSdk.Broadcast.Handlers>() as OrcaSdk.Broadcast.Handlers;
-                    InitializeParams(appSettings.type);
+                    InitializeParams(AppSettings.type);
                     break;
             }
 
@@ -122,36 +119,27 @@ namespace orca.orcavoip
                 var conn = GameObject.FindObjectOfType<Broadcast.BroadcastConnection>(true) as Broadcast.BroadcastConnection;
                 GetInstance.connection = conn ?
                  conn : null;
-                 //OrcaGameObject.AddComponent(typeof(Broadcast.BroadcastConnection)) as Broadcast.BroadcastConnection;
+                //OrcaGameObject.AddComponent(typeof(Broadcast.BroadcastConnection)) as Broadcast.BroadcastConnection;
 
                 var currhandler = GameObject.FindObjectOfType<Broadcast.BroadcastHandlers>(true) as Broadcast.BroadcastHandlers;
                 GetInstance.handler = currhandler ?
                  GetInstance.handler : null;
-                 //OrcaGameObject.AddComponent(typeof(Broadcast.BroadcastHandlers)) as Broadcast.BroadcastHandlers;
+                //OrcaGameObject.AddComponent(typeof(Broadcast.BroadcastHandlers)) as Broadcast.BroadcastHandlers;
             }
             else if (type == VoipType.P2P)
             {
                 var conn = GameObject.FindObjectOfType<P2P.P2PConnection>(true) as P2P.P2PConnection;
                 instance.connection = conn ?
                  conn : null;
-                 //OrcaGameObject.AddComponent(typeof(P2P.P2PConnection)) as P2P.P2PConnection;
+                //OrcaGameObject.AddComponent(typeof(P2P.P2PConnection)) as P2P.P2PConnection;
 
                 var currhandler = GameObject.FindObjectOfType<P2P.P2PHandlers>(true) as P2P.P2PHandlers;
                 instance.handler = currhandler ?
                  currhandler : null;
-                 //OrcaGameObject.AddComponent(typeof(P2P.P2PHandlers)) as P2P.P2PHandlers;
+                //OrcaGameObject.AddComponent(typeof(P2P.P2PHandlers)) as P2P.P2PHandlers;
             }
             else throw new ArgumentException($"Invalid enum type: {type}");
         }
-
-        //public void SetAuthKey(string key)
-        //{
-        //    AuthKey = key;
-        //    Debug.Log($"Auth Key set to {AuthKey}");
-        //}
-        //public string GetAuthKey(){
-        //    return AuthKey;
-        //}
 
         async public Task Connect()
         {
@@ -164,7 +152,7 @@ namespace orca.orcavoip
 
             if (connType == typeof(P2P.P2PConnection))
             {
-                
+
                 var conn = (P2P.P2PConnection)instance.connection;
                 //conn.Connect(url);
 
@@ -179,7 +167,7 @@ namespace orca.orcavoip
                     currhandler.connection = conn;
                     conn.handler = currhandler;
 
-                    conn.SetParameters(url, "PEER_TO_PEER", "Ft4G[S8#YLRA3K!woe_Ws");
+                    conn.SetParameters(AppSettings.url, "PEER_TO_PEER", "Ft4G[S8#YLRA3K!woe_Ws");
                 }
                 p2PConnection = conn;
             }
@@ -202,7 +190,7 @@ namespace orca.orcavoip
                     currhandler.connection = conn;
                     conn.handler = currhandler;
 
-                    //conn.SetParameters(url, "Broadcast", AppSettings.AuthKey);
+                    //conn.SetParameters(AppSettings.url, "Broadcast", AppSettings.AuthKey);
                 }
             }
             await p2PConnection.ConnectAsync();
@@ -261,21 +249,6 @@ namespace orca.orcavoip
             }
 
 #if UNITY_EDITOR
-
-            //string orcaResourcesDirectory = "Assets/ORCA/Resources/";
-            //string orcaSettingsAssetsPath = orcaResourcesDirectory + "OrcaSetting.asset";
-            //string appSettingDirectory = Path.GetDirectoryName(orcaSettingsAssetsPath);
-
-            //if (!Directory.Exists(appSettingDirectory))
-            //{
-            //    Directory.CreateDirectory(appSettingDirectory);
-            //    AssetDatabase.ImportAsset(appSettingDirectory);
-            //}
-
-            //if (!File.Exists(orcaSettingsAssetsPath))
-            //{
-            //    AssetDatabase.CreateAsset(appSettings, orcaSettingsAssetsPath);
-            //}
             AssetDatabase.CreateAsset(appSettings, "Assets/Resources/OrcaSetting.asset");
             AssetDatabase.SaveAssets();
 #endif
