@@ -2,7 +2,8 @@
 using UnityEngine;
 using UnityEditor;
 using orca.orcavoip;
-// using PackageManager = UnityEditor.PackageManager;
+
+
 #if UNITY_EDITOR
 [InitializeOnLoad]
 public class OrcaWizard : EditorWindow
@@ -15,20 +16,6 @@ public class OrcaWizard : EditorWindow
         EditorWindow.GetWindow(typeof(OrcaWizard));
     }
 
-    //private void Awake()
-    //{
-    //    if (OrcaVOIP.AppSettings != null && !string.IsNullOrEmpty(OrcaVOIP.AppSettings.AuthKey))
-    //    {
-    //        this.AuthenticationToken = OrcaVOIP.AppSettings.AuthKey;
-    //    }
-    //}
-
-    //private static void HighlightSettings()
-    //{
-    //    AppSettings appSettings = (AppSettings)Resources.Load(OrcaVOIP.appSettingsFileName, typeof(AppSettings));
-    //    Selection.objects = new UnityEngine.Object[] {appSettings};
-    //    EditorGUIUtility.PingObject(appSettings);
-    //}
 
     [MenuItem("Orca/Orca Wizard")]
     [InitializeOnLoadMethod]
@@ -60,11 +47,6 @@ public class OrcaWizard : EditorWindow
         GUILayout.Label("You can always close this window and setup later from the menu");
     }
 
-    //public override void SaveChanges()
-    //{
-    //    orca.SetAuthKey(AuthenticationToken);
-    //    base.SaveChanges();
-    //}
 
     private void SetupAuthKey(string AuthKey)
     {
