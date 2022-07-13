@@ -249,10 +249,19 @@ namespace orca.orcavoip
             }
 
 #if UNITY_EDITOR
+            if (!Directory.Exists("Assets/Resources/"))
+            {
+                try
+                {
+                    Directory.CreateDirectory("Assets/Resources/");
+                }catch (IOException e)
+                {
+                    Debug.LogError($"Error while creating directory: {e}");
+                }
+            }
             AssetDatabase.CreateAsset(appSettings, "Assets/Resources/OrcaSetting.asset");
             AssetDatabase.SaveAssets();
 #endif
-
         }
     }
 }

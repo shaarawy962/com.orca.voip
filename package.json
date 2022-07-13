@@ -2,7 +2,7 @@
   "name": "com.orca.orcavoip",
   "displayName": "Orca VOIP",
   "description": "VOIP solution for games",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "unity": "2021.2",
   "dependencies": {
     "com.unity.webrtc":"2.4.0-exp.6",

@@ -31,6 +31,7 @@ public class OrcaWizard : EditorWindow
     //}
 
     [MenuItem("Orca/Orca Wizard")]
+    [InitializeOnLoadMethod]
     static void Init()
     {
         EditorWindow window = EditorWindow.CreateWindow<OrcaWizard>();
@@ -49,7 +50,6 @@ public class OrcaWizard : EditorWindow
         if (GUILayout.Button("Setup ORCA"))
         {
             SetupAuthKey(AuthenticationToken);
-            
         }
         if (GUILayout.Button("Cancel"))
         {

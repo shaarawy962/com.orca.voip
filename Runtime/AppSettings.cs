@@ -11,10 +11,10 @@ namespace orca.orcavoip
         private string authkey = "";
 
         [SerializeField]
-        public VoipType type;
+        public VoipType type = VoipType.P2P;
 
         [SerializeField]
-        public string url = "167.172.100.251:34197";
+        public const string url = "167.172.100.251:34197";
 
         public string AuthKey
         {
