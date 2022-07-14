@@ -91,7 +91,7 @@ namespace orca.orcavoip
                 // }
                 // else IP_ADDRESS = url;
                 //IP_ADDRESS = IpAddress.text;
-                    websocket = new WebSocket($"ws://{url}?mode={mode}&key={encodedKey}");
+                websocket = new WebSocket($"ws://{url}?mode={mode}&key={encodedKey}");
 
                 websocket.OnOpen += async () =>
                 {

@@ -168,7 +168,7 @@ namespace orca.orcavoip
                     currhandler.connection = conn;
                     conn.handler = currhandler;
 
-                    conn.SetParameters(AppSettings.url, "PEER_TO_PEER", "Ft4G[S8#YLRA3K!woe_Ws");
+                    conn.SetParameters(AppSettings.url, "PEER_TO_PEER", AppSettings.AuthKey);
                 }
                 p2PConnection = conn;
             }
